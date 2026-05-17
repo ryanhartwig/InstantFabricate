@@ -137,10 +137,30 @@ end)
 -- Auto-enable from saved state
 -------------------
 
+-- Recipes aren't loaded at game startup, so we defer application.
+-- Hook the first craft attempt to apply speeds once recipes exist.
+local needsDeferred = false
+
 if loadState() then
     local count = applySpeed()
     enabled = true
-    print(string.format("[%s] Auto-enabled from saved state (%d recipes)\n", MOD_NAME, count))
+    if count > 0 then
+        print(string.format("[%s] Auto-enabled from saved state (%d recipes)\n", MOD_NAME, count))
+    else
+        -- Recipes not loaded yet — defer until first craft
+        needsDeferred = true
+        print(string.format("[%s] Saved state=ON, deferring until recipes load\n", MOD_NAME))
+    end
 end
+
+RegisterHook("/Script/UWECrafting.UWECraftingComponent:ServerCraftItemFromRecipe", function(self)
+    if needsDeferred and enabled then
+        local count = applySpeed()
+        if count > 0 then
+            needsDeferred = false
+            print(string.format("[%s] Deferred apply: %d recipes set to %.2fs\n", MOD_NAME, count, config.CraftTime))
+        end
+    end
+end)
 
 print(string.format("[%s] Press %s to toggle instant fabrication\n", MOD_NAME, config.Keybind))
