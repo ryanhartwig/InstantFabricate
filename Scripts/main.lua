@@ -1,22 +1,18 @@
 -- InstantFabricate for Subnautica 2
 -- Host-only mod: instantly (or near-instantly) fabricate items.
--- Toggle with configurable keybind (default F7).
+-- Toggle with configurable keybind (default F5).
 -- Clients benefit automatically when the host has this enabled.
 
 local UEHelpers = require("UEHelpers")
+local config = require("config")
 
 local VERSION = "1.0.0"
 local MOD_NAME = "InstantFabricate"
+print(string.format("[%s] v%s loaded\n", MOD_NAME, VERSION))
 
 -------------------
--- Configuration --
+-- Keybind Setup --
 -------------------
-
-local config = {
-    Keybind = "F7",
-    CraftTime = 0.01,
-    Notify = true,
-}
 
 local keyMap = {
     A = Key.A, B = Key.B, C = Key.C, D = Key.D, E = Key.E,
@@ -29,45 +25,11 @@ local keyMap = {
     F5 = Key.F5, F6 = Key.F6, F7 = Key.F7, F8 = Key.F8,
 }
 
-local function loadConfig()
-    local modDir = debug.getinfo(1, "S").source:match("@(.*/)")
-    local configPath = modDir .. "../config.txt"
-
-    local file = io.open(configPath, "r")
-    if not file then
-        print(string.format("[%s] config.txt not found, using defaults\n", MOD_NAME))
-        return
-    end
-
-    for line in file:lines() do
-        if line ~= "" and not line:match("^#") then
-            local key, value = line:match("^([%w_]+)%s*=%s*(.*)$")
-            if key and value then
-                value = value:match("^%s*(.-)%s*$")
-                if key == "keybind" then
-                    config.Keybind = value:upper()
-                elseif key == "craft_time" then
-                    config.CraftTime = tonumber(value) or 0.01
-                elseif key == "notify" then
-                    config.Notify = (value == "true")
-                end
-            end
-        end
-    end
-
-    file:close()
-end
-
-loadConfig()
-
 local bindKey = keyMap[config.Keybind]
 if not bindKey then
-    print(string.format("[%s] Unknown keybind '%s', defaulting to F7\n", MOD_NAME, config.Keybind))
-    bindKey = Key.F7
+    print(string.format("[%s] Unknown keybind '%s', defaulting to F5\n", MOD_NAME, config.Keybind))
+    bindKey = Key.F5
 end
-
-print(string.format("[%s] v%s loaded | keybind=%s, craft_time=%.2f, notify=%s\n",
-    MOD_NAME, VERSION, config.Keybind, config.CraftTime, tostring(config.Notify)))
 
 -------------------
 -- Core Logic    --
