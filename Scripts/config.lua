@@ -5,9 +5,12 @@ config.Keybind = "F5"
 config.CraftTime = 0.01
 config.Notify = true
 
+-- Resolve mod root directory (exposed for state file access)
+config.ModDir = debug.getinfo(1, "S").source:match("@(.*/)")  .. "../"
+
 -- Parse config.txt from the mod's root folder
 local function loadConfig()
-    local modDir = debug.getinfo(1, "S").source:match("@(.*/)")
+    local modDir = config.ModDir
     local configPath = modDir .. "../config.txt"
 
     local file = io.open(configPath, "r")

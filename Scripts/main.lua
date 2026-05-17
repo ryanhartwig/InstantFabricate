@@ -32,6 +32,28 @@ if not bindKey then
 end
 
 -------------------
+-- State Persistence
+-------------------
+
+local statePath = config.ModDir .. "state.txt"
+
+local function saveState(isEnabled)
+    local file = io.open(statePath, "w")
+    if file then
+        file:write(isEnabled and "enabled=true" or "enabled=false")
+        file:close()
+    end
+end
+
+local function loadState()
+    local file = io.open(statePath, "r")
+    if not file then return false end
+    local content = file:read("*a")
+    file:close()
+    return content:match("enabled=true") ~= nil
+end
+
+-------------------
 -- Core Logic    --
 -------------------
 
@@ -98,15 +120,27 @@ RegisterKeyBind(bindKey, function()
         if enabled then
             local count = restoreSpeed()
             enabled = false
+            saveState(false)
             print(string.format("[%s] DISABLED — %d recipes restored to vanilla\n", MOD_NAME, count))
             notify("Instant Fabricate: OFF")
         else
             local count = applySpeed()
             enabled = true
+            saveState(true)
             print(string.format("[%s] ENABLED — %d recipes set to %.2fs\n", MOD_NAME, count, config.CraftTime))
             notify("Instant Fabricate: ON")
         end
     end)
 end)
+
+-------------------
+-- Auto-enable from saved state
+-------------------
+
+if loadState() then
+    local count = applySpeed()
+    enabled = true
+    print(string.format("[%s] Auto-enabled from saved state (%d recipes)\n", MOD_NAME, count))
+end
 
 print(string.format("[%s] Press %s to toggle instant fabrication\n", MOD_NAME, config.Keybind))
