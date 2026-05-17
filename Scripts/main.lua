@@ -137,28 +137,20 @@ end)
 -- Auto-enable from saved state
 -------------------
 
--- Recipes aren't loaded at game startup, so we defer application.
--- Hook the first craft attempt to apply speeds once recipes exist.
-local needsDeferred = false
+-- Recipes aren't loaded at game startup, so we defer until the player
+-- spawns into the world (OnPossessedPawnChangedFunction fires on world load).
+local savedState = loadState()
 
-if loadState() then
-    local count = applySpeed()
+if savedState then
     enabled = true
-    if count > 0 then
-        print(string.format("[%s] Auto-enabled from saved state (%d recipes)\n", MOD_NAME, count))
-    else
-        -- Recipes not loaded yet — defer until first craft
-        needsDeferred = true
-        print(string.format("[%s] Saved state=ON, deferring until recipes load\n", MOD_NAME))
-    end
+    print(string.format("[%s] Saved state=ON, will apply when world loads\n", MOD_NAME))
 end
 
-RegisterHook("/Script/UWECrafting.UWECraftingComponent:ServerCraftItemFromRecipe", function(self)
-    if needsDeferred and enabled then
+RegisterHook("/Script/Subnautica2.SN2PlayerController:OnPossessedPawnChangedFunction", function(self, pawnOld, pawnNew)
+    if enabled and next(originalCraftTimes) == nil then
         local count = applySpeed()
         if count > 0 then
-            needsDeferred = false
-            print(string.format("[%s] Deferred apply: %d recipes set to %.2fs\n", MOD_NAME, count, config.CraftTime))
+            print(string.format("[%s] World loaded — %d recipes set to %.2fs\n", MOD_NAME, count, config.CraftTime))
         end
     end
 end)
