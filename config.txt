@@ -1,0 +1,14 @@
+# InstantFabricate Configuration
+# https://github.com/ryanhartwig/InstantFabricate
+
+# keybind: Key to toggle instant fabrication on/off in-game
+# Options: A-Z, F1-F8
+keybind = F7
+
+# craft_time: Crafting time in seconds when mod is active
+# 0.01 = instant, 0.5 = half second, 1.0 = one second
+# Vanilla values are typically 1.5-2.0s per item
+craft_time = 0.01
+
+# notify: Show in-game toast notification when toggling
+notify = true
