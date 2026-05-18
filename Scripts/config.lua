@@ -11,7 +11,7 @@ config.ModDir = debug.getinfo(1, "S").source:match("@(.*/)")  .. "../"
 -- Parse config.txt from the mod's root folder
 local function loadConfig()
     local modDir = config.ModDir
-    local configPath = modDir .. "../config.txt"
+    local configPath = modDir .. "config.txt"
 
     local file = io.open(configPath, "r")
     if not file then
