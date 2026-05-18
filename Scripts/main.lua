@@ -6,7 +6,7 @@
 local UEHelpers = require("UEHelpers")
 local config = require("config")
 
-local VERSION = "1.0.0"
+local VERSION = "1.0.1"
 local MOD_NAME = "InstantFabricate"
 print(string.format("[%s] v%s loaded\n", MOD_NAME, VERSION))
 
